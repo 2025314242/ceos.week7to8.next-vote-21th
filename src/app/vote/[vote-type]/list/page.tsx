@@ -10,8 +10,6 @@ export default function VoteStep1() {
 
   const type = params['vote-type'];
 
-  console.log(type);
-
   return (
     <>
       {/* title */}

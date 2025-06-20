@@ -1,13 +1,16 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import { useAuthStore } from '@/lib/store/use-auth-store';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: isDev ? '' : process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // allow refreshToken
+  withCredentials: true,
 });
 
 // accessToken auto-injection
@@ -31,13 +34,16 @@ axiosInstance.interceptors.response.use(
     // status 401: Unauthorized
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
+
+      const refreshToken = Cookies.get('refreshToken');
+      if (!refreshToken) {
+        useAuthStore.getState().clearAuth();
+        return Promise.reject(err);
+      }
+
       try {
-        const refreshRes = await axios.post(
-          '__REFRESH_API_URL__',
-          {},
-          { withCredentials: true }, // contain refreshToken
-        );
-        const newAccessToken = refreshRes.data.accessToken;
+        const { data } = await axiosInstance.post('/api/auth/refresh', { refreshToken });
+        const { accessToken: newAccessToken } = data;
         useAuthStore.getState().setAccessToken(newAccessToken);
         original.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(original);

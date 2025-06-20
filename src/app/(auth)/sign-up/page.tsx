@@ -8,9 +8,9 @@ import Back from '@/components/common/back';
 import Button from '@/components/features/auth/button';
 import InputForm from '@/components/features/auth/input-form';
 import ToggleGroup from '@/components/features/auth/toggle-group';
-import { PART_LABELS, TEAM_LABELS } from '@/lib/constants/member-data';
 import { signup } from '@/services/api/auth';
-import { SignUpInput, signUpSchema } from '@/types/auth.dto';
+import { PART_LABELS, TEAM_LABELS } from '@/types/auth.dto';
+import { SignUpInput, SignUpRequest, signUpSchema } from '@/types/auth.dto';
 
 export default function SignUp() {
   const {
@@ -21,15 +21,18 @@ export default function SignUp() {
   } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      part: 'FE',
-      team: '프로메사',
+      part: 'FRONTEND',
+      team: 'PROMESA',
     },
   });
 
   const router = useRouter();
 
   const onSubmit = async (data: SignUpInput) => {
-    await signup(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword: _confirmPassword, ...rest } = data;
+    const submitData: SignUpRequest = rest;
+    await signup(submitData);
     router.push('/login');
   };
 
@@ -41,7 +44,7 @@ export default function SignUp() {
       </div>
       <div className="flex flex-col gap-4">
         <InputForm label="Name" name="name" register={register} error={errors.name} />
-        <InputForm label="ID" name="id" register={register} error={errors.id} />
+        <InputForm label="ID" name="identifier" register={register} error={errors.identifier} />
         <InputForm label="Password" name="password" type="password" register={register} error={errors.password} />
         <InputForm
           label="Password Confirm"
@@ -51,7 +54,7 @@ export default function SignUp() {
           error={errors.confirmPassword}
         />
         <InputForm label="Email" name="email" register={register} error={errors.email} />
-        <div className="flex gap-10">
+        <div className="flex gap-4">
           <ToggleGroup label="Part" name="part" options={[...PART_LABELS]} control={control} error={errors.part} />
           <ToggleGroup label="Team" name="team" options={[...TEAM_LABELS]} control={control} error={errors.team} />
         </div>

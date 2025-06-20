@@ -16,6 +16,15 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    const beforeFiles = [
+      { source: '/api/vote/:path*', destination: `${process.env.NEXT_PUBLIC_BASE_URL}/vote/:path*` },
+      { source: '/api/:path*', destination: `${process.env.NEXT_PUBLIC_BASE_URL}/api/:path*` },
+    ];
+    return {
+      beforeFiles,
+    };
+  },
 };
 
 export default nextConfig;

@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import Back from '@/components/common/back';
@@ -19,17 +18,11 @@ export default function Login() {
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['user'] }); // force user cache refresh
-      router.push('/');
-    },
-  });
-
-  const onSubmit = (data: LoginInput) => mutation.mutate(data);
+  const onSubmit = async (data: LoginInput) => {
+    await login(data);
+    router.push('/');
+  };
 
   return (
     <div className="flex h-full flex-col px-10">
@@ -38,7 +31,7 @@ export default function Login() {
         <h1 className="text-headline-03 text-grayscale-00-black mx-auto">Login</h1>
       </div>
       <div className="flex flex-col gap-4">
-        <InputForm label="ID" name="id" register={register} error={errors.id} />
+        <InputForm label="ID" name="identifier" register={register} error={errors.identifier} />
         <InputForm label="Password" name="password" type="password" register={register} error={errors.password} />
       </div>
       <div className="absolute inset-x-10 top-3/4">

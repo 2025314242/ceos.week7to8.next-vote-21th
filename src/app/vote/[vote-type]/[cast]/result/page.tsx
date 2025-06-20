@@ -1,14 +1,16 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import ResultGrid from '@/components/features/vote/result-grid';
-import { MEMBER_DATA, TEAM_LABELS } from '@/lib/constants/member-data';
+import { getVoteResult } from '@/services/api/vote';
 
 export default function VoteStep3() {
   const params = useParams();
   const router = useRouter();
   const type = params['cast'];
+  const [result, setResult] = useState<{ id: number; name: string; voteCount: number }[]>([]);
 
   const getTitle = () => {
     if (type === 'front') return 'FE 파트장 투표 결과';
@@ -17,19 +19,19 @@ export default function VoteStep3() {
     return '';
   };
 
-  const getCandidates = () => {
-    if (type === 'front') return MEMBER_DATA['FE'];
-    if (type === 'back') return MEMBER_DATA['BE'];
-    return TEAM_LABELS;
-  };
+  const voteType = type === 'front' ? 'FE_LEADER' : type === 'back' ? 'BE_LEADER' : 'DEMO_DAY';
 
-  // 임시 득표수 설정 함수 (추후 backend API로 변경경)
-  const getCandidatesWithVotes = () => {
-    return getCandidates().map((name, index) => ({
-      name,
-      votes: 10 - index, // 임시 득표수: 앞사람이 더 많이 받음
-    }));
-  };
+  useEffect(() => {
+    // 임시 득표수 설정 함수 (추후 backend API로 변경경)
+    const getCandidatesWithVotes = async () => {
+      const data = await getVoteResult(voteType);
+
+      if (data.length > 0) {
+        setResult(data);
+      }
+    };
+    getCandidatesWithVotes();
+  }, [voteType]);
 
   const onSubmit = () => {
     // 첫 화면으로 이동
@@ -44,7 +46,7 @@ export default function VoteStep3() {
       </div>
       {/* content */}
       <div>
-        <ResultGrid list={getCandidatesWithVotes()} />
+        <ResultGrid list={result} />
         <div className="flex justify-center">
           <button
             onClick={onSubmit}
