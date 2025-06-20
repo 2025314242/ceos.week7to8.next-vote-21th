@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-import { useUser } from '@/hooks/use-user';
+import { useAuthStore } from '@/lib/store/use-auth-store';
 import { logout } from '@/services/api/auth';
 
 interface LogoutModalProps {
@@ -11,7 +11,7 @@ interface LogoutModalProps {
 
 export default function LogoutModal({ onClose }: LogoutModalProps) {
   const router = useRouter();
-  const { user } = useUser();
+  const user = useAuthStore.getState().user;
 
   if (!user) return null;
 
@@ -27,10 +27,10 @@ export default function LogoutModal({ onClose }: LogoutModalProps) {
         className="bg-neutral-01 grid h-51.5 w-67 items-center border-2 p-6 shadow-md"
       >
         <div>
-          <p className="text-caption-01 mb-7 justify-self-center">{`${user.team} ${user.part} ${user.name}`}</p>
+          <p className="text-caption-01 mb-7 justify-self-center">{user.id}</p>
           <button
             onClick={handleLogout}
-            className="text-caption-01 mx-auto block h-11.5 w-38.5 rounded-full border-2 border-black px-4 py-2 transition hover:bg-gray-100"
+            className="text-caption-01 mx-auto block h-11.5 w-38.5 cursor-pointer rounded-full border-2 border-black px-4 py-2 transition hover:bg-gray-100"
           >
             Logout
           </button>

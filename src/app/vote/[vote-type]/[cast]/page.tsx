@@ -1,24 +1,21 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import Back from '@/components/common/back';
 import CandidateGrid from '@/components/features/vote/candidate-grid';
-import { MEMBER_DATA, TEAM_LABELS } from '@/lib/constants/member-data';
-import { useVoteStore } from '@/lib/store/use-vote-store';
+import { getVoteList, vote } from '@/services/api/vote';
 
 export default function VoteStep2() {
   const params = useParams();
   const router = useRouter();
+  const [candidates, setCandidates] = useState<{ id: number; name: string }[]>([]);
+  const [selectedId, setSelectedId] = useState(-1);
 
   // front / back / demo
   const type = params['cast'];
-
-  const getCandidates = () => {
-    if (type === 'front') return MEMBER_DATA['FE'];
-    if (type === 'back') return MEMBER_DATA['BE'];
-    return TEAM_LABELS;
-  };
+  const voteType = type === 'front' ? 'FE_LEADER' : type === 'back' ? 'BE_LEADER' : 'DEMO_DAY';
 
   const getTitle = () => {
     if (type === 'front') return 'FE 파트장 투표';
@@ -27,25 +24,25 @@ export default function VoteStep2() {
     return '';
   };
 
-  const { selectedFrontend, selectedBackend, selectedTeam } = useVoteStore();
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      const data = await getVoteList(voteType);
 
-  const onSubmit = () => {
-    let selected: string | null = null;
+      setCandidates(data);
+    };
 
-    if (type === 'front') selected = selectedFrontend;
-    else if (type === 'back') selected = selectedBackend;
-    else if (type === 'team') selected = selectedTeam;
+    fetchCandidates();
+  }, [voteType]);
 
-    if (!selected) {
-      alert('후보를 선택해주세요!');
-      return;
+  const handleClick = (id: number) => setSelectedId(id);
+
+  const onSubmit = async () => {
+    const data = await vote(voteType, selectedId);
+
+    if (data) {
+      // 투표 애니메이션 페이지로 이동
+      router.push(`/vote/${params['vote-type']}/${type}/aggregate`);
     }
-
-    // TODO: 나중에 이곳에서 API 요청
-    // await fetch('/api/vote', { method: 'POST', body: JSON.stringify({ voteType, selected }) });
-
-    // 투표 애니메이션 페이지로 이동
-    router.push(`/vote/${params['vote-type']}/${type}/aggregate`);
   };
 
   return (
@@ -57,7 +54,7 @@ export default function VoteStep2() {
       </div>
       {/* content */}
       <div>
-        <CandidateGrid list={getCandidates()} />
+        <CandidateGrid list={candidates} selectedId={selectedId} handleClick={handleClick} />
         <div className="flex justify-center">
           <button
             onClick={onSubmit}

@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 
 import Button from '@/components/features/auth/button';
@@ -7,9 +9,25 @@ import { useAuthStore } from '@/lib/store/use-auth-store';
 import VoteIcon from '@/public/icons/vote.svg';
 
 export default function Landing() {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isHydrated, setHydrated] = useState(false);
+
   const user = useAuthStore((state) => state.user);
-  const isLoggedIn = !!user;
   const id = user?.id;
+
+  useEffect(() => {
+    const refreshToken = Cookies.get('refreshToken');
+
+    if (refreshToken && !user) {
+      setLoggedIn(true);
+    }
+
+    setHydrated(true);
+  }, [isLoggedIn, user]);
+
+  if (!isHydrated) {
+    return null;
+  }
 
   return (
     <div className="flex h-full flex-col px-10">

@@ -10,8 +10,8 @@ export default function VoteList() {
       {/* content */}
       <div className="mb-15 grid h-full items-center">
         <div className="grid gap-10">
-          <SelectVoteButton text="파트장 투표" href="/vote/part/list" type="파트장 투표" />
-          <SelectVoteButton text="데모데이 투표" href="/vote/demo/list" type="데모데이 투표" />
+          <SelectVoteButton text="파트장 투표" href="/vote/part/list" />
+          <SelectVoteButton text="데모데이 투표" href="/vote/demo/list" />
         </div>
       </div>
     </>

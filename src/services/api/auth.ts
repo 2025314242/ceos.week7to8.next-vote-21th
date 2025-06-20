@@ -1,25 +1,32 @@
+import Cookies from 'js-cookie';
+
 import { useAuthStore } from '@/lib/store/use-auth-store';
-import { LoginInput, SignUpInput } from '@/types/auth.dto';
-import { User } from '@/types/user';
+import { LoginInput, SignUpRequest } from '@/types/auth.dto';
 
 import { axiosInstance } from './axios';
 
-interface AuthResponse {
-  accessToken: string;
-  user: User;
-}
-
 export const login = async (input: LoginInput): Promise<void> => {
-  const res = await axiosInstance.post<AuthResponse>('__LOGIN_API_URL__', input);
-  const { accessToken, user } = res.data;
-  useAuthStore.getState().setAuth(user, accessToken);
+  const res = await axiosInstance.post('/api/auth/login', input);
+
+  if (res.status === 200) {
+    const { accessToken, refreshToken } = res.data.data;
+    useAuthStore.getState().setAuth({ id: input.identifier }, accessToken);
+
+    Cookies.set('refreshToken', refreshToken, {
+      path: '/',
+      sameSite: 'lax',
+      secure: false,
+    });
+  }
 };
 
-export const signup = async (input: SignUpInput): Promise<void> => {
-  await axiosInstance.post('__SIGNUP_API_URL__', input);
+export const signup = async (input: SignUpRequest): Promise<void> => {
+  await axiosInstance.post('/api/auth/signup', input);
 };
 
 export const logout = async (): Promise<void> => {
-  await axiosInstance.post('__LOGOUT_API_URL__');
+  await axiosInstance.post('/api/auth/logout');
   useAuthStore.getState().clearAuth();
+
+  Cookies.remove('refreshToken', { path: '/' });
 };

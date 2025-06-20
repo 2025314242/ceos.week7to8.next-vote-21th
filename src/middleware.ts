@@ -1,37 +1,26 @@
+// middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
-
-import { User } from '@/types/user';
 
 const PROTECTED_PATHS = ['/vote'];
 const PUBLIC_ONLY_PATHS = ['/login', '/sign-up'];
 
-async function getUserFromRequest(req: NextRequest): Promise<User | null> {
-  try {
-    const res = await fetch('__REFRESH_API_URL', {
-      method: 'POST',
-      headers: {
-        cookie: req.headers.get('cookie') || '',
-      },
-      credentials: 'include',
-    });
-
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.user;
-  } catch {
-    return null;
-  }
+/**
+ * Edge 런타임에서는 http 외부 fetch가 막히므로
+ * refreshToken 쿠키 존재만으로 로그인 여부를 판단.
+ */
+function isLoggedIn(req: NextRequest): boolean {
+  return Boolean(req.cookies.get('refreshToken')?.value);
 }
 
-export async function middleware(req: NextRequest): Promise<NextResponse<unknown>> {
-  const pathname = req.nextUrl.pathname;
-  const user = await getUserFromRequest(req);
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const loggedIn = isLoggedIn(req);
 
-  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !user) {
+  if (PROTECTED_PATHS.some((p) => pathname.startsWith(p)) && !loggedIn) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  if (PUBLIC_ONLY_PATHS.includes(pathname) && user) {
+  if (PUBLIC_ONLY_PATHS.includes(pathname) && loggedIn) {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
