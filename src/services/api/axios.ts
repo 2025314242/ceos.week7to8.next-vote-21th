@@ -6,7 +6,7 @@ import { useAuthStore } from '@/lib/store/use-auth-store';
 const isDev = process.env.NODE_ENV === 'development';
 
 export const axiosInstance = axios.create({
-  baseURL: isDev ? '' : process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: isDev ? '' : process.env.BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
