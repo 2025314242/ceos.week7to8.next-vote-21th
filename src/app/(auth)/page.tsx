@@ -18,12 +18,12 @@ export default function Landing() {
   useEffect(() => {
     const refreshToken = Cookies.get('refreshToken');
 
-    if (refreshToken && !user) {
+    if (refreshToken && !!user) {
       setLoggedIn(true);
     }
 
     setHydrated(true);
-  }, [isLoggedIn, user]);
+  }, [user]);
 
   if (!isHydrated) {
     return null;

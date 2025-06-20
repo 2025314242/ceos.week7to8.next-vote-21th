@@ -3,10 +3,7 @@ import Cookies from 'js-cookie';
 
 import { useAuthStore } from '@/lib/store/use-auth-store';
 
-const isDev = process.env.NODE_ENV === 'development';
-
 export const axiosInstance = axios.create({
-  baseURL: isDev ? '' : process.env.BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -42,7 +39,7 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        const { data } = await axiosInstance.post('/api/auth/refresh', { refreshToken });
+        const { data } = await axios.post('/api/auth/refresh', { refreshToken });
         const { accessToken: newAccessToken } = data;
         useAuthStore.getState().setAccessToken(newAccessToken);
         original.headers.Authorization = `Bearer ${newAccessToken}`;
