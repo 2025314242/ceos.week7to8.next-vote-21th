@@ -13,17 +13,22 @@ export const axiosInstance = axios.create({
 // accessToken auto-injection
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const accessToken = useAuthStore.getState().accessToken;
+    const token = useAuthStore.getState().accessToken;
 
-    if (!accessToken) {
+    if (!token) {
       const refreshToken = Cookies.get('refreshToken');
 
       // /api/auth/refresh
       if (refreshToken) {
         try {
-          const { data } = await axios.post('/api/auth/refresh', {}, { headers: { 'Refresh-Token': refreshToken } });
-          const { accessToken: newAccessToken } = data;
-          useAuthStore.getState().setAccessToken(newAccessToken);
+          const { data } = await axios.post(
+            '/api/auth/refresh',
+            {},
+            {
+              headers: { 'Refresh-Token': refreshToken },
+            },
+          );
+          useAuthStore.getState().setAccessToken(data.data.accessToken);
         } catch (refreshError) {
           useAuthStore.getState().clearAuth();
           Cookies.remove('refreshToken', { path: '/' });
@@ -32,10 +37,10 @@ axiosInstance.interceptors.request.use(
       }
     }
 
-    const refreshedAccessToken = useAuthStore.getState().accessToken;
+    const newToken = useAuthStore.getState().accessToken;
 
-    if (refreshedAccessToken) {
-      config.headers.Authorization = `Bearer ${refreshedAccessToken}`;
+    if (newToken) {
+      config.headers.Authorization = `Bearer ${newToken}`;
     }
 
     return config;
@@ -62,9 +67,16 @@ axiosInstance.interceptors.response.use(
 
       // /api/auth/refresh
       try {
-        const { data } = await axios.post('/api/auth/refresh', {}, { headers: { 'Refresh-Token': refreshToken } });
-        const { accessToken: newAccessToken } = data;
-        useAuthStore.getState().setAccessToken(newAccessToken);
+        const { data } = await axios.post(
+          '/api/auth/refresh',
+          {},
+          {
+            headers: { 'Refresh-Token': refreshToken },
+          },
+        );
+        useAuthStore.getState().setAccessToken(data.data.accessToken);
+        original.headers.Authorization = `Bearer ${data.data.accessToken}`;
+        return axiosInstance(original);
       } catch (refreshError) {
         useAuthStore.getState().clearAuth();
         return Promise.reject(refreshError);

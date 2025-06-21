@@ -11,10 +11,12 @@ export const login = async (input: LoginInput): Promise<void> => {
   if (res.status === 200) {
     const { accessToken, refreshToken } = res.data.data;
     useAuthStore.getState().setAuth({ id: input.identifier }, accessToken);
+
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
     Cookies.set('refreshToken', refreshToken, {
       path: '/',
-      sameSite: 'lax',
-      secure: false,
+      secure: isSecure,
+      sameSite: isSecure ? 'None' : 'Lax',
     });
   }
 };
