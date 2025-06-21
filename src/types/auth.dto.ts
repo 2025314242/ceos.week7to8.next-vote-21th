@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PART_LABELS = ['PROUDCT', 'DESIGN', 'BACKEND', 'FRONTEND'] as const;
+export const PART_LABELS = ['BACKEND', 'FRONTEND'] as const;
 
 export const TEAM_LABELS = ['PROMESA', 'LOOPZ', 'INFLUY', 'HANIHOME', 'DEARDREAM'] as const;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import Back from '@/components/common/back';
@@ -15,7 +15,6 @@ export default function VoteStep2() {
 
   // front / back / demo
   const type = params['cast'];
-  const voteType = type === 'front' ? 'FE_LEADER' : type === 'back' ? 'BE_LEADER' : 'DEMO_DAY';
 
   const getTitle = () => {
     if (type === 'front') return 'FE 파트장 투표';
@@ -24,7 +23,16 @@ export default function VoteStep2() {
     return '';
   };
 
+  const voteType = useMemo(() => {
+    if (type === 'front') return 'FE_LEADER';
+    if (type === 'back') return 'BE_LEADER';
+    if (type === 'team') return 'DEMO_DAY';
+    return '';
+  }, [type]);
+
   useEffect(() => {
+    if (!voteType) return;
+
     const fetchCandidates = async () => {
       const data = await getVoteList(voteType);
 
@@ -37,6 +45,8 @@ export default function VoteStep2() {
   const handleClick = (id: number) => setSelectedId(id);
 
   const onSubmit = async () => {
+    if (!voteType) return;
+
     const data = await vote(voteType, selectedId);
 
     if (data) {

@@ -18,7 +18,7 @@ export const getVoteList = async (voteType: (typeof VOTE_TYPES)[number]): Promis
 export const vote = async (voteType: (typeof VOTE_TYPES)[number], candidateId: number): Promise<string | null> => {
   try {
     const res = await axiosInstance.post(`/api/vote/${voteType}`, { candidateId });
-    return res.data.message;
+    return res.data.data.message;
   } catch (error) {
     const err = error as AxiosError<{ code: string; reason: string }>;
     if (err.response?.status === 403 && err.response.data?.code === 'Member_403') {
