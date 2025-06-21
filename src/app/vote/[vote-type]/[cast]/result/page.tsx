@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import ResultGrid from '@/components/features/vote/result-grid';
@@ -19,9 +19,16 @@ export default function VoteStep3() {
     return '';
   };
 
-  const voteType = type === 'front' ? 'FE_LEADER' : type === 'back' ? 'BE_LEADER' : 'DEMO_DAY';
+  const voteType = useMemo(() => {
+    if (type === 'front') return 'FE_LEADER';
+    if (type === 'back') return 'BE_LEADER';
+    if (type === 'team') return 'DEMO_DAY';
+    return '';
+  }, [type]);
 
   useEffect(() => {
+    if (!voteType) return;
+
     // 임시 득표수 설정 함수 (추후 backend API로 변경경)
     const getCandidatesWithVotes = async () => {
       const data = await getVoteResult(voteType);
@@ -35,7 +42,7 @@ export default function VoteStep3() {
 
   const onSubmit = () => {
     // 첫 화면으로 이동
-    router.push(`/`);
+    router.push(`/vote/list`);
   };
 
   return (

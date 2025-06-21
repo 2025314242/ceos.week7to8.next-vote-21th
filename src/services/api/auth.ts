@@ -11,7 +11,6 @@ export const login = async (input: LoginInput): Promise<void> => {
   if (res.status === 200) {
     const { accessToken, refreshToken } = res.data.data;
     useAuthStore.getState().setAuth({ id: input.identifier }, accessToken);
-
     Cookies.set('refreshToken', refreshToken, {
       path: '/',
       sameSite: 'lax',
@@ -26,7 +25,7 @@ export const signup = async (input: SignUpRequest): Promise<void> => {
 
 export const logout = async (): Promise<void> => {
   await axiosInstance.post('/api/auth/logout');
-  useAuthStore.getState().clearAuth();
 
+  useAuthStore.getState().clearAuth();
   Cookies.remove('refreshToken', { path: '/' });
 };
