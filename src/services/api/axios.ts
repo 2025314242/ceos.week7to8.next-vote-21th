@@ -15,12 +15,8 @@ axiosInstance.interceptors.request.use(
   async (config) => {
     const accessToken = useAuthStore.getState().accessToken;
 
-    console.log(`access: ${accessToken}`);
-
     if (!accessToken) {
       const refreshToken = Cookies.get('refreshToken');
-
-      console.log(`refresh: ${refreshToken}`);
 
       // /api/auth/refresh
       if (refreshToken) {
