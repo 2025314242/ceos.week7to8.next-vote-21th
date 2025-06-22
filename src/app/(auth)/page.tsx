@@ -66,7 +66,7 @@ export default function Landing() {
           <Button href="/vote/list" text="Start" />
         ) : (
           <>
-            <Button href="/login" text="Join us" />
+            <Button href="/login" text="Login" />
             <Link href="/sign-up">
               <div className="mt-[14px] flex justify-center">
                 <p className="text-caption-04 text-grayscale-00-black cursor-pointer underline">Sign up as a member</p>
