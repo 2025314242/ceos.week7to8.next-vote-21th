@@ -1,3 +1,6 @@
 export interface User {
-  id: string;
+  identifier: string;
+  part: string;
+  team: string;
+  name: string;
 }

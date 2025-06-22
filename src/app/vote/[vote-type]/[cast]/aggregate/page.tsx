@@ -74,6 +74,7 @@ export default function VoteStep3() {
         <div className="mt-6 flex justify-center">
           <button
             onClick={handleResult}
+            disabled={!showButton}
             className={`text-caption-01 ${showButton ? 'hover:bg-neutral-01 cursor-pointer' : ''} bg-grayscale-03 h-11.5 w-38.5 rounded-[100px] border-2 transition-all duration-500`}
           >
             결과 보기

@@ -1,29 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import Button from '@/components/features/auth/button';
-import { useAuthStore } from '@/lib/store/use-auth-store';
 import VoteIcon from '@/public/icons/vote.svg';
+import { me } from '@/services/api/auth';
 
 export default function Landing() {
+  const pathname = usePathname();
+  const [id, setId] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isHydrated, setHydrated] = useState(false);
 
-  const user = useAuthStore((state) => state.user);
-  const id = user?.id;
-
   useEffect(() => {
-    const refreshToken = Cookies.get('refreshToken');
+    const fetchUser = async () => {
+      const user = await me();
+      const id = user?.identifier;
 
-    if (refreshToken && !!user) {
-      setLoggedIn(true);
-    }
+      if (id) {
+        setLoggedIn(true);
+        setId(id);
+      }
 
-    setHydrated(true);
-  }, [user]);
+      setHydrated(true);
+    };
+
+    fetchUser();
+  }, [pathname]);
 
   if (!isHydrated) {
     return null;

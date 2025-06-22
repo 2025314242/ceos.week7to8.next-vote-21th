@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { useAuthStore } from '@/lib/store/use-auth-store';
+import { useTokenStore } from '@/lib/store/use-token-store';
 
 export const axiosInstance = axios.create({
   headers: {
@@ -13,7 +13,7 @@ export const axiosInstance = axios.create({
 // accessToken auto-injection
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const token = useAuthStore.getState().accessToken;
+    const token = useTokenStore.getState().accessToken;
 
     if (!token) {
       const refreshToken = Cookies.get('refreshToken');
@@ -28,16 +28,16 @@ axiosInstance.interceptors.request.use(
               headers: { 'Refresh-Token': refreshToken },
             },
           );
-          useAuthStore.getState().setAccessToken(data.data.accessToken);
+          useTokenStore.getState().setAccessToken(data.data.accessToken);
         } catch (refreshError) {
-          useAuthStore.getState().clearAuth();
+          useTokenStore.getState().clear();
           Cookies.remove('refreshToken', { path: '/' });
           return Promise.reject(refreshError);
         }
       }
     }
 
-    const newToken = useAuthStore.getState().accessToken;
+    const newToken = useTokenStore.getState().accessToken;
 
     if (newToken) {
       config.headers.Authorization = `Bearer ${newToken}`;
@@ -60,7 +60,7 @@ axiosInstance.interceptors.response.use(
 
       const refreshToken = Cookies.get('refreshToken');
       if (!refreshToken) {
-        useAuthStore.getState().clearAuth();
+        useTokenStore.getState().clear();
         Cookies.remove('refreshToken', { path: '/' });
         return Promise.reject(err);
       }
@@ -74,11 +74,11 @@ axiosInstance.interceptors.response.use(
             headers: { 'Refresh-Token': refreshToken },
           },
         );
-        useAuthStore.getState().setAccessToken(data.data.accessToken);
+        useTokenStore.getState().setAccessToken(data.data.accessToken);
         original.headers.Authorization = `Bearer ${data.data.accessToken}`;
         return axiosInstance(original);
       } catch (refreshError) {
-        useAuthStore.getState().clearAuth();
+        useTokenStore.getState().clear();
         return Promise.reject(refreshError);
       }
     }

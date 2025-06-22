@@ -1,7 +1,8 @@
 import Cookies from 'js-cookie';
 
-import { useAuthStore } from '@/lib/store/use-auth-store';
+import { useTokenStore } from '@/lib/store/use-token-store';
 import { LoginInput, SignUpRequest } from '@/types/auth.dto';
+import type { User } from '@/types/user';
 
 import { axiosInstance } from './axios';
 
@@ -10,7 +11,7 @@ export const login = async (input: LoginInput): Promise<void> => {
 
   if (res.status === 200) {
     const { accessToken, refreshToken } = res.data.data;
-    useAuthStore.getState().setAuth({ id: input.identifier }, accessToken);
+    useTokenStore.getState().setAccessToken(accessToken);
 
     const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
     Cookies.set('refreshToken', refreshToken, {
@@ -28,6 +29,17 @@ export const signup = async (input: SignUpRequest): Promise<void> => {
 export const logout = async (): Promise<void> => {
   await axiosInstance.post('/api/auth/logout');
 
-  useAuthStore.getState().clearAuth();
+  useTokenStore.getState().clear();
   Cookies.remove('refreshToken', { path: '/' });
+};
+
+export const me = async (): Promise<User | null> => {
+  try {
+    const res = await axiosInstance.get('/api/auth/me');
+    const myData = res.data.data;
+    return myData;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };
