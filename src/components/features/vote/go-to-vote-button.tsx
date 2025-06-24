@@ -37,7 +37,7 @@ export default function GoToVoteButton({ text1, text2, href, disabled }: ButtonP
           </button>
           <button
             onClick={onResultClick}
-            className="text-caption-03 bg-grayscale-03 hover:bg-neutral-01 z-20 flex h-9 w-19.5 cursor-pointer items-center justify-center rounded-full border-2 transition-colors"
+            className="text-caption-03 bg-grayscale-03 hover:bg-neutral-01 z-100 flex h-9 w-19.5 cursor-pointer items-center justify-center rounded-full border-2 transition-colors"
           >
             결과 보기
           </button>
