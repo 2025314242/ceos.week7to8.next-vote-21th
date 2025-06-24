@@ -17,7 +17,12 @@ export default function ResultGrid({ list }: { list: ResultItem[] }) {
   return (
     <div className={`grid grid-rows-5 gap-x-4 gap-y-3 ${columns === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
       {list.map((item) => (
-        <ResultCard key={item.name} name={item.name} votes={item.voteCount} isTop={item.voteCount === maxVotes} />
+        <ResultCard
+          key={item.name}
+          name={item.name}
+          votes={item.voteCount}
+          isTop={item.voteCount === maxVotes && item.voteCount > 0}
+        />
       ))}
     </div>
   );
