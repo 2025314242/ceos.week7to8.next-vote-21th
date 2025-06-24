@@ -1,8 +1,11 @@
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const PROTECTED_PATHS = ['/vote'];
 const PUBLIC_ONLY_PATHS = ['/login', '/sign-up'];
+const PROTECTED_EXACT_MATCHES: RegExp[] = [
+  /^\/vote\/[^/]+\/[^/]+\/(aggregate|result)$/,
+  /^\/vote\/[^/]+\/(?!list$)[^/]+$/,
+];
 
 /**
  * Edge 런타임에서는 http 외부 fetch가 막히므로
@@ -12,12 +15,16 @@ function isLoggedIn(req: NextRequest): boolean {
   return Boolean(req.cookies.get('refreshToken')?.value);
 }
 
+function matchesProtectedPath(pathname: string): boolean {
+  return PROTECTED_EXACT_MATCHES.some((regex) => regex.test(pathname));
+}
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const loggedIn = isLoggedIn(req);
 
-  if (PROTECTED_PATHS.some((p) => pathname.startsWith(p)) && !loggedIn) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  if (matchesProtectedPath(pathname) && !loggedIn) {
+    return NextResponse.redirect(new URL('/vote/list', req.url));
   }
 
   if (PUBLIC_ONLY_PATHS.includes(pathname) && loggedIn) {
@@ -28,5 +35,11 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/vote/:path*', '/login', '/sign-up'],
+  matcher: [
+    '/login',
+    '/sign-up',
+    '/vote/:voteType/:castType',
+    '/vote/:voteType/:castType/aggregate',
+    '/vote/:voteType/:castType/result',
+  ],
 };

@@ -20,8 +20,12 @@ export default function Login() {
   const router = useRouter();
 
   const onSubmit = async (data: LoginInput) => {
-    await login(data);
-    router.push('/');
+    try {
+      await login(data);
+      router.push('/');
+    } catch {
+      alert('로그인에 실패하였습니다.');
+    }
   };
 
   return (
