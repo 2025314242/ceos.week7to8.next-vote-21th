@@ -2,10 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_ONLY_PATHS = ['/login', '/sign-up'];
-const PROTECTED_EXACT_MATCHES: RegExp[] = [
-  /^\/vote\/[^/]+\/[^/]+\/(aggregate|result)$/,
-  /^\/vote\/[^/]+\/(?!list$)[^/]+$/,
-];
+const PROTECTED_EXACT_MATCHES: RegExp[] = [/^\/vote\/[^/]+\/[^/]+\/aggregate$/, /^\/vote\/[^/]+\/(?!list$)[^/]+$/];
 
 /**
  * Edge 런타임에서는 http 외부 fetch가 막히므로
@@ -35,11 +32,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/login',
-    '/sign-up',
-    '/vote/:voteType/:castType',
-    '/vote/:voteType/:castType/aggregate',
-    '/vote/:voteType/:castType/result',
-  ],
+  matcher: ['/login', '/sign-up', '/vote/:voteType/:castType', '/vote/:voteType/:castType/aggregate'],
 };

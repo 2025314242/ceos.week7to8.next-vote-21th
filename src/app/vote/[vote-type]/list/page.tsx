@@ -10,6 +10,7 @@ import { me } from '@/services/api/auth';
 export default function VoteStep1() {
   const params = useParams();
   const [part, setPart] = useState('');
+  const [loggedIn, setLoggedIn] = useState(true);
 
   const type = params['vote-type'];
 
@@ -17,6 +18,10 @@ export default function VoteStep1() {
     const fetchPart = async () => {
       const userData = await me();
       const partData = userData?.part;
+
+      if (userData) {
+        setLoggedIn(false);
+      }
 
       if (partData) {
         setPart(partData);
@@ -50,7 +55,7 @@ export default function VoteStep1() {
         </div>
       ) : (
         <div className="mb-15 grid h-full items-center">
-          <GoToVoteButton text1="데모데이 투표" text2="" href="/vote/demo/team" disabled={false} />
+          <GoToVoteButton text1="데모데이 투표" text2="" href="/vote/demo/team" disabled={loggedIn} />
         </div>
       )}
     </>
