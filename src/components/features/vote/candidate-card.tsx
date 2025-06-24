@@ -7,11 +7,11 @@ export default function CandidateCard({
   id: number;
   name: string;
   selectedId: number;
-  handleClick: (id: number) => void;
+  handleClick: (id: number, name: string) => void;
 }) {
   return (
     <button
-      onClick={() => handleClick(id)}
+      onClick={() => handleClick(id, name)}
       className={
         'bg-grayscale-04 text-body-01 hover:bg-neutral-01-tp relative flex h-13.5 cursor-pointer items-center justify-center border-2 border-black transition-colors'
       }

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 import Back from '@/components/common/back';
 import CandidateGrid from '@/components/features/vote/candidate-grid';
+import { me } from '@/services/api/auth';
 import { getVoteList, vote } from '@/services/api/vote';
 
 export default function VoteStep2() {
@@ -42,10 +43,24 @@ export default function VoteStep2() {
     fetchCandidates();
   }, [voteType]);
 
-  const handleClick = (id: number) => setSelectedId(id);
+  const handleClick = async (id: number, name: string) => {
+    const userData = await me();
+
+    if (userData && type === 'team' && userData.team === name) {
+      alert('현재 사용자가 속한 팀입니다. 다른 팀을 선택해 주세요.');
+      return;
+    }
+
+    setSelectedId(id);
+  };
 
   const onSubmit = async () => {
     if (!voteType) return;
+
+    if (selectedId < 0) {
+      alert('투표를 완료한 후, 제출해 주세요.');
+      return;
+    }
 
     const data = await vote(voteType, selectedId);
 

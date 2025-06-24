@@ -10,7 +10,7 @@ export default function CandidateGrid({
 }: {
   list: { id: number; name: string }[];
   selectedId: number;
-  handleClick: (id: number) => void;
+  handleClick: (id: number, name: string) => void;
 }) {
   const columns = list.length <= 5 ? 1 : 2;
 

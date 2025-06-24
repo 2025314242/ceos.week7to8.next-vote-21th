@@ -51,7 +51,9 @@ export default function Landing() {
         ) : (
           <>
             <div className="relative flex-[5]">
-              <VoteIcon className="text-grayscale-00-black absolute top-2/5 drop-shadow-[4px_6px_8px_rgba(0,0,0,0.25)]" />
+              <Link href="/vote/list" title="투표 목록으로 이동">
+                <VoteIcon className="text-grayscale-00-black absolute top-2/5 drop-shadow-[4px_6px_8px_rgba(0,0,0,0.25)]" />
+              </Link>
             </div>
             <div className="relative flex-[7]">
               <p className="text-headline-01 text-grayscale-00-black absolute top-1/4 text-shadow-[4px_6px_8px_rgba(0,0,0,0.25)]">
