@@ -34,7 +34,7 @@ export default function LogoutModal({ onClose }: LogoutModalProps) {
   };
 
   return (
-    <div className="bg-accent-dark-tp fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+    <div className="bg-accent-dark-tp fixed inset-0 z-999 flex items-center justify-center" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="bg-neutral-01 grid h-51.5 w-67 items-center border-2 p-6 shadow-md"
